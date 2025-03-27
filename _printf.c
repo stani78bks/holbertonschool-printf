@@ -46,7 +46,7 @@ int _printf(const char *format, ...)
                 write(1, "%", 1);
                 count++;
             }
-            else /* Si format inconnu, affiche % */
+            else /* Gestion des formats inconnus (%X, %!) */
             {
                 write(1, "%", 1);
                 write(1, format, 1);
