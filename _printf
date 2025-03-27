@@ -1,70 +1,88 @@
 #include "main.h"
 #include <stdarg.h>
-#include <unistd.h>
+#include <stdio.h>
 
 /**
- * _printf - Fonction qui imite printf
- * @format: Chaîne de format avec des spécificateurs
- * Return: Nombre de caractères imprimés
+ * print_char - Affiche un caractère
+ * @c: Le caractère à afficher
+ * Return: 1 (le nombre de caractères affichés)
+ */
+int print_char(char c)
+{
+    putchar(c);
+    return (1);
+}
+
+/**
+ * print_string - Affiche une chaîne de caractères
+ * @str: La chaîne de caractères à afficher
+ * Return: Le nombre de caractères affichés
+ */
+int print_string(char *str)
+{
+    int count = 0;
+
+    if (str == NULL)
+        str = "(null)";
+    while (*str)
+    {
+        putchar(*str);
+        str++;
+        count++;
+    }
+    return (count);
+}
+
+/**
+ * handle_format - Gère les formats spécifiques (%c, %s, %%)
+ * @format: Le format à traiter
+ * @args: La liste d'arguments variable
+ * Return: Le nombre de caractères affichés
+ */
+int handle_format(char format, va_list args)
+{
+    if (format == 'c')
+        return (print_char(va_arg(args, int)));
+    if (format == 's')
+        return (print_string(va_arg(args, char *)));
+    if (format == '%')
+        return (print_char('%'));  // Affiche '%' lorsqu'on rencontre le format '%'
+
+    // Si le format est inconnu, affiche le caractère '%' suivi du caractère format
+    putchar('%');
+    putchar(format);
+    return (2);
+}
+
+/**
+ * _printf - Fonction personnalisée qui imite printf
+ * @format: La chaîne de format
+ * Return: Le nombre de caractères imprimés, ou -1 en cas d'erreur
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int count = 0;
-	char *str;
-	char c;
+    va_list args;
+    int count = 0;
 
-	if (!format)
-		return (-1);
+    if (format == NULL)
+        return (-1);
+    va_start(args, format);
 
-	va_start(args, format);
-
-	while (*format)
-	{
-		if (*format == '%') /* Détection d'un spécificateur */
-		{
-			format++; /* Avance pour lire le spécificateur */
-			if (*format == 'c') /* Cas d'un caractère */
-			{
-				c = va_arg(args, int);
-				write(1, &c, 1);
-				count++;
-			}
-			else if (*format == 's') /* Cas d'une chaîne */
-			{
-				str = va_arg(args, char *);
-				if (!str)
-					str = "(null)";
-				while (*str)
-				{
-					write(1, str, 1);
-					str++;
-					count++;
-				}
-			}
-			else if (*format == '%') /* Cas d'un pourcentage */
-			{
-				write(1, "%", 1);
-				count++;
-			}
-			else if (*format == '\0') /* Cas d'un '%' en fin de chaîne */
-				return (-1);
-			else /* Spécificateur inconnu */
-			{
-				write(1, "%", 1);
-				write(1, format, 1);
-				count += 2;
-			}
-		}
-		else /* Impression normale */
-		{
-			write(1, format, 1);
-			count++;
-		}
-		format++; /* Passe au prochain caractère */
-	}
-
-	va_end(args);
-	return (count);
+    while (*format)
+    {
+        if (*format == '%')  // Si le caractère actuel est '%', appeler handle_format
+        {
+            format++;  // Passer au caractère suivant après '%'
+            count += handle_format(*format, args);  // Traiter le format
+        }
+        else  // Si ce n'est pas un format, afficher le caractère normalement
+        {
+            putchar(*format);
+            count++;
+        }
+        format++;  // Passer au caractère suivant dans la chaîne de format
+    }
+    va_end(args);
+    return (count);
 }
 
