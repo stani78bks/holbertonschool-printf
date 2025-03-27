@@ -3,64 +3,64 @@
 #include <unistd.h>
 
 /**
- * _printf - Fonction qui imite printf
- * @format: Chaîne de format avec des spécificateurs
- * Return: Nombre de caractères imprimés
+ * _printf - Fonction personnalisée qui imite printf
+ * @format: chaîne de format
+ * Return: nombre de caractères imprimés, ou -1 en cas d'erreur
  */
 int _printf(const char *format, ...)
 {
     va_list args;
     int count = 0;
 
-    if (!format)
+    if (format == NULL)
         return (-1);
 
     va_start(args, format);
 
     while (*format)
     {
-        if (*format == '%')  /* Détecte un formatage */
+        if (*format == '%')  /* Détection d'un caractère '%' */
         {
-            format++; /* Passe au caractère suivant */
+            format++;  /* Passer au caractère suivant */
 
-            /* Si c'est un format valide */
-            if (*format == 'c')  /* %c */
+            if (*format == 'c')  /* %c : caractère */
             {
                 char c = va_arg(args, int);
                 write(1, &c, 1);
                 count++;
             }
-            else if (*format == 's') /* %s */
+            else if (*format == 's')  /* %s : chaîne de caractères */
             {
                 char *str = va_arg(args, char *);
-                if (!str)
-                    str = "(null)"; /* Pour éviter les erreurs avec NULL */
-                while (*str)
+
+                if (str == NULL)  /* Si la chaîne est NULL, afficher "(null)" */
+                    str = "(null)";
+
+                while (*str)  /* Afficher chaque caractère de la chaîne */
                 {
                     write(1, str, 1);
                     str++;
                     count++;
                 }
             }
-            else if (*format == '%') /* %% */
+            else if (*format == '%')  /* %% : afficher '%' */
             {
                 write(1, "%", 1);
                 count++;
             }
-            else /* Pour les formats inconnus (%X, %!, etc.) */
+            else  /* Si c'est un format inconnu */
             {
-                /* Affiche le caractère '%' et le caractère suivant */
-                write(1, "%", 1);  /* Affiche '%' */
-                write(1, format, 1); /* Affiche le caractère suivant */
-                count += 2;  /* Compte le '%' et le caractère suivant */
+                write(1, "%", 1);  /* Afficher le '%' */
+                write(1, format, 1);  /* Afficher le caractère suivant */
+                count += 2;  /* Ajouter 2 à count (le '%' et le caractère suivant) */
             }
         }
-        else /* Si ce n'est pas un % (caractère normal) */
+        else  /* Caractère normal */
         {
             write(1, format, 1);
             count++;
         }
-        format++;  /* Passe au caractère suivant */
+        format++;  /* Passer au caractère suivant */
     }
 
     va_end(args);
