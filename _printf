@@ -1,67 +1,67 @@
+#include "main.h"
 #include <stdarg.h>
 #include <unistd.h>
 
 /**
- * _printf - Fonction qui imprime des caractères et des chaînes avec %c, %s, %%
- * @format: Chaîne de format
- * Return: Nombre de caractères imprimés (hors '\0')
+ * _printf - Fonction qui imite printf
+ * @format: Chaîne de format avec des spécificateurs
+ * Return: Nombre de caractères imprimés
  */
 int _printf(const char *format, ...)
 {
-    va_list args;
-    int count = 0; /* Nombre de caractères imprimés*/
-    char *str;
-    
-    if (format == NULL)
-        return (-1); /* Vérification de la chaîne de format*/
-    
-    va_start(args, format);
+	va_list args;
+	int count = 0;
+	char *str;
 
-    while (*format)
-    {
-        if (*format == '%') /* Vérification du spécificateur*/
-        {
-            format++; // Passer au caractère suivant
+	if (!format)
+		return (-1);
 
-            if (*format == 'c') /* Gestion de %c (un seul caractère)*/
-            {
-                char c = va_arg(args, int);
-                write(1, &c, 1);
-                count++;
-            }
-            else if (*format == 's') /* Gestion de %s (une chaîne)*/
-            {
-                str = va_arg(args, char *);
-                if (str == NULL) /* Cas où la chaîne est NULL*/
-                    str = "(null)";
-                while (*str)
-                {
-                    write(1, str, 1);
-                    str++;
-                    count++;
-                }
-            }
-            else if (*format == '%') /* Gestion de %%*/
-            {
-                write(1, "%", 1);
-                count++;
-            }
-            else /* Si le format n'est pas reconnu, on imprime tel quel*/
-            {
-                write(1, "%", 1);
-                write(1, format, 1);
-                count += 2;
-            }
-        }
-        else /* Impression normale sans format*/
-        {
-            write(1, format, 1);
-            count++;
-        }
-        format++;
-    }
+	va_start(args, format);
 
-    va_end(args);
-    return (count);
+	while (*format)
+	{
+		if (*format == '%') /* Détection d'un spécificateur */
+		{
+			format++;
+			if (*format == 'c') /* Cas d'un caractère */
+			{
+				char c = va_arg(args, int);
+				write(1, &c, 1);
+				count++;
+			}
+			else if (*format == 's') /* Cas d'une chaîne */
+			{
+				str = va_arg(args, char *);
+				if (!str)
+					str = "(null)";
+				while (*str)
+				{
+					write(1, str, 1);
+					str++;
+					count++;
+				}
+			}
+			else if (*format == '%') /* Cas d'un pourcentage */
+			{
+				write(1, "%", 1);
+				count++;
+			}
+			else /* Si le spécificateur est invalide, on imprime % + caractère */
+			{
+				write(1, "%", 1);
+				write(1, format, 1);
+				count += 2;
+			}
+		}
+		else /* Cas normal où il faut afficher le caractère */
+		{
+			write(1, format, 1);
+			count++;
+		}
+		format++;
+	}
+
+	va_end(args);
+	return (count);
 }
 
