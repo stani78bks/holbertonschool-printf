@@ -1,0 +1,67 @@
+#include <stdarg.h>
+#include <unistd.h>
+
+/**
+ * _printf - Fonction qui imprime des caractères et des chaînes avec %c, %s, %%
+ * @format: Chaîne de format
+ * Return: Nombre de caractères imprimés (hors '\0')
+ */
+int _printf(const char *format, ...)
+{
+    va_list args;
+    int count = 0; /* Nombre de caractères imprimés*/
+    char *str;
+    
+    if (format == NULL)
+        return (-1); /* Vérification de la chaîne de format*/
+    
+    va_start(args, format);
+
+    while (*format)
+    {
+        if (*format == '%') /* Vérification du spécificateur*/
+        {
+            format++; // Passer au caractère suivant
+
+            if (*format == 'c') /* Gestion de %c (un seul caractère)*/
+            {
+                char c = va_arg(args, int);
+                write(1, &c, 1);
+                count++;
+            }
+            else if (*format == 's') /* Gestion de %s (une chaîne)*/
+            {
+                str = va_arg(args, char *);
+                if (str == NULL) /* Cas où la chaîne est NULL*/
+                    str = "(null)";
+                while (*str)
+                {
+                    write(1, str, 1);
+                    str++;
+                    count++;
+                }
+            }
+            else if (*format == '%') /* Gestion de %%*/
+            {
+                write(1, "%", 1);
+                count++;
+            }
+            else /* Si le format n'est pas reconnu, on imprime tel quel*/
+            {
+                write(1, "%", 1);
+                write(1, format, 1);
+                count += 2;
+            }
+        }
+        else /* Impression normale sans format*/
+        {
+            write(1, format, 1);
+            count++;
+        }
+        format++;
+    }
+
+    va_end(args);
+    return (count);
+}
+
