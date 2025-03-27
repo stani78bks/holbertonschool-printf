@@ -65,6 +65,13 @@ Pas de variables globales.
 
 Maximum 5 fonctions par fichier.
 
+
+
+![Flowchart-1](image/Flowchart-1.png)
+
+
+
+
 Auteurs
 
 stani78bks
