@@ -15,8 +15,8 @@ int print_char(char c)
 
 /**
  * print_string - Affiche une chaîne de caractères
- * @str: La chaîne de caractères à afficher
- * Return: Le nombre de caractères affichés
+ * @str: La chaîne à afficher
+ * Return: Nombre de caractères affichés
  */
 int print_string(char *str)
 {
@@ -27,17 +27,17 @@ int print_string(char *str)
 	while (*str)
 	{
 		putchar(*str);
-		str++;
 		count++;
+		str++;
 	}
 	return (count);
 }
 
 /**
- * handle_format - Gère les formats spécifiques (%c, %s, %%)
- * @format: Le format à traiter
- * @args: La liste d'arguments variable
- * Return: Le nombre de caractères affichés
+ * handle_format - Gère les spécificateurs de format
+ * @format: Le caractère de format
+ * @args: Liste d'arguments
+ * Return: Nombre de caractères affichés
  */
 int handle_format(char format, va_list args)
 {
@@ -54,9 +54,9 @@ int handle_format(char format, va_list args)
 }
 
 /**
- * _printf - Fonction personnalisée qui imite printf
- * @format: La chaîne de format
- * Return: Le nombre de caractères imprimés, ou -1 en cas d'erreur
+ * _printf - Imite la fonction printf
+ * @format: Chaîne de format
+ * Return: Nombre de caractères imprimés
  */
 int _printf(const char *format, ...)
 {
@@ -65,14 +65,15 @@ int _printf(const char *format, ...)
 
 	if (format == NULL)
 		return (-1);
-	va_start(args, format);
 
+	va_start(args, format);
 	while (*format)
 	{
 		if (*format == '%')
 		{
 			format++;
-			count += handle_format(*format, args);
+			if (*format)
+				count += handle_format(*format, args);
 		}
 		else
 		{
