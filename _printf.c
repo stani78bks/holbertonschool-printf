@@ -22,14 +22,15 @@ int _printf(const char *format, ...)
         if (*format == '%')  /* Détecte un formatage */
         {
             format++; /* Passe au caractère suivant */
-
-            if (*format == 'c')  /* Gestion du %c */
+            
+            /* Si c'est un format valide */
+            if (*format == 'c')  /* %c */
             {
                 char c = va_arg(args, int);
                 write(1, &c, 1);
                 count++;
             }
-            else if (*format == 's') /* Gestion du %s */
+            else if (*format == 's') /* %s */
             {
                 char *str = va_arg(args, char *);
                 if (!str)
@@ -41,24 +42,24 @@ int _printf(const char *format, ...)
                     count++;
                 }
             }
-            else if (*format == '%') /* Gestion de %% */
+            else if (*format == '%') /* %% */
             {
                 write(1, "%", 1);
                 count++;
             }
-            else /* Gestion des formats inconnus (%X, %!) */
+            else /* Gestion des formats inconnus (%X, %!, etc.) */
             {
-                write(1, "%", 1);
-                write(1, format, 1);
-                count += 2;
+                write(1, "%", 1);  /* Affiche le caractère '%' */
+                write(1, format, 1); /* Affiche le caractère suivant */
+                count += 2;  /* Compte le '%' et le caractère suivant */
             }
         }
-        else /* Caractère normal */
+        else /* Si ce n'est pas un % (caractère normal) */
         {
             write(1, format, 1);
             count++;
         }
-        format++;
+        format++;  /* Passe au caractère suivant */
     }
 
     va_end(args);
