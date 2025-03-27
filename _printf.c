@@ -22,7 +22,7 @@ int _printf(const char *format, ...)
         if (*format == '%')  /* Détecte un formatage */
         {
             format++; /* Passe au caractère suivant */
-            
+
             /* Si c'est un format valide */
             if (*format == 'c')  /* %c */
             {
@@ -47,9 +47,10 @@ int _printf(const char *format, ...)
                 write(1, "%", 1);
                 count++;
             }
-            else /* Gestion des formats inconnus (%X, %!, etc.) */
+            else /* Pour les formats inconnus (%X, %!, etc.) */
             {
-                write(1, "%", 1);  /* Affiche le caractère '%' */
+                /* Affiche le caractère '%' et le caractère suivant */
+                write(1, "%", 1);  /* Affiche '%' */
                 write(1, format, 1); /* Affiche le caractère suivant */
                 count += 2;  /* Compte le '%' et le caractère suivant */
             }
