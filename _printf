@@ -12,6 +12,7 @@ int _printf(const char *format, ...)
 	va_list args;
 	int count = 0;
 	char *str;
+	char c;
 
 	if (!format)
 		return (-1);
@@ -25,7 +26,7 @@ int _printf(const char *format, ...)
 			format++;
 			if (*format == 'c') /* Cas d'un caractère */
 			{
-				char c = va_arg(args, int);
+				c = va_arg(args, int);
 				write(1, &c, 1);
 				count++;
 			}
@@ -46,14 +47,16 @@ int _printf(const char *format, ...)
 				write(1, "%", 1);
 				count++;
 			}
-			else /* Si le spécificateur est invalide, on imprime % + caractère */
+			else if (*format == '\0') /* Cas d'un '%' en fin de chaîne */
+				return (-1);
+			else /* Spécificateur inconnu */
 			{
 				write(1, "%", 1);
 				write(1, format, 1);
 				count += 2;
 			}
 		}
-		else /* Cas normal où il faut afficher le caractère */
+		else /* Impression normale */
 		{
 			write(1, format, 1);
 			count++;
