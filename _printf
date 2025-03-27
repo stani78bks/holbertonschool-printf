@@ -23,7 +23,7 @@ int _printf(const char *format, ...)
 	{
 		if (*format == '%') /* Détection d'un spécificateur */
 		{
-			format++;
+			format++; /* Avance pour lire le spécificateur */
 			if (*format == 'c') /* Cas d'un caractère */
 			{
 				c = va_arg(args, int);
@@ -61,7 +61,7 @@ int _printf(const char *format, ...)
 			write(1, format, 1);
 			count++;
 		}
-		format++;
+		format++; /* Passe au prochain caractère */
 	}
 
 	va_end(args);
