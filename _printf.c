@@ -2,9 +2,9 @@
 #include <unistd.h>
 
 /**
- * print_char - Affiche un caractère
- * @args: Liste d'arguments
- * Return: 1 (nombre de caractères imprimés)
+ * print_char - Imprime un caractère.
+ * @args: Liste des arguments.
+ * Return: Nombre de caractères imprimés.
  */
 int print_char(va_list args)
 {
@@ -14,38 +14,38 @@ int print_char(va_list args)
 }
 
 /**
- * print_string - Affiche une chaîne de caractères
- * @args: Liste d'arguments
- * Return: Nombre de caractères imprimés
+ * print_string - Imprime une chaîne de caractères.
+ * @args: Liste des arguments.
+ * Return: Nombre de caractères imprimés.
  */
 int print_string(va_list args)
 {
 	char *str = va_arg(args, char *);
 	int count = 0;
 
-	/* Ajout d'une ligne vide après les déclarations */
 	if (!str)
 		str = "(null)";
 
 	while (*str)
 	{
-		if (write(1, str, 1) == -1)
-			return (-1);
+		write(1, str, 1);
 		str++;
 		count++;
 	}
-
 	return (count);
 }
 
 /**
- * handle_format - Gère les spécificateurs de format
- * @format: Caractère de format
- * @args: Liste d'arguments
- * Return: Nombre de caractères imprimés
+ * handle_format - Gère les spécificateurs de format.
+ * @format: Caractère de format.
+ * @args: Liste des arguments.
+ * Return: Nombre de caractères imprimés ou -1 en cas d'erreur.
  */
 int handle_format(char format, va_list args)
 {
+	if (format == '\0') /* Cas où % est seul */
+		return (-1);
+
 	if (format == 'c')
 		return (print_char(args));
 
@@ -55,16 +55,16 @@ int handle_format(char format, va_list args)
 	if (format == '%')
 		return (write(1, "%", 1));
 
-	/* Supprime le else inutile */
+	/* Affichage d'un % suivi du caractère inconnu */
 	write(1, "%", 1);
 	write(1, &format, 1);
 	return (2);
 }
 
 /**
- * _printf - Implémentation simplifiée de printf
- * @format: Chaîne de format
- * Return: Nombre de caractères imprimés
+ * _printf - Implémentation simplifiée de printf.
+ * @format: La chaîne de format contenant les spécificateurs.
+ * Return: Le nombre de caractères imprimés.
  */
 int _printf(const char *format, ...)
 {
@@ -82,6 +82,11 @@ int _printf(const char *format, ...)
 		{
 			format++;
 			temp = handle_format(*format, args);
+			if (temp == -1) /* Gestion du cas "%\0" */
+			{
+				va_end(args);
+				return (-1);
+			}
 		}
 		else
 		{
