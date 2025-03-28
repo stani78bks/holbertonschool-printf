@@ -1,6 +1,6 @@
 #include <stdarg.h>
-#include <stdio.h>
 #include "main.h"
+#include <stddef.h>
 
 /**
  * _printf - Custom implementation of printf
@@ -30,19 +30,19 @@ int _printf(const char *format, ...)
 			if (*format == '\0')
 				return (-1);
 			else if (*format == 'c')
-				count += putchar(va_arg(args, int));
+				count += _putchar(va_arg(args, int));
 			else if (*format == 's')
-				count += print_string(va_arg(args, char *));
+				count += print_string(va_arg(args, char*));
 			else if (*format == '%')
-				count += putchar('%');
+				count += _putchar('%');
 			else
 			{
-				count += putchar('%');
-				count += putchar(*format);
+				count += _putchar('%');
+				count += _putchar(*format);
 			}
 		}
 		else
-			count += putchar(*format);
+			count += _putchar(*format);
 		format++;
 	}
 
