@@ -8,8 +8,9 @@
  */
 int print_char(va_list args)
 {
-    char c = va_arg(args, int);
-    return (write(1, &c, 1) == -1 ? -1 : 1);
+	char c = va_arg(args, int);
+
+	return (write(1, &c, 1));
 }
 
 /**
@@ -19,19 +20,45 @@ int print_char(va_list args)
  */
 int print_string(va_list args)
 {
-    char *str = va_arg(args, char *);
-    int count = 0, i;
+	char *str = va_arg(args, char *);
+	int count = 0;
 
-    if (!str)
-        str = "(null)";
-    
-    for (i = 0; str[i] != '\0'; i++)
-    {
-        if (write(1, &str[i], 1) == -1)
-            return (-1);
-        count++;
-    }
-    return (count);
+	/* Ajout d'une ligne vide après les déclarations */
+	if (!str)
+		str = "(null)";
+
+	while (*str)
+	{
+		if (write(1, str, 1) == -1)
+			return (-1);
+		str++;
+		count++;
+	}
+
+	return (count);
+}
+
+/**
+ * handle_format - Gère les spécificateurs de format
+ * @format: Caractère de format
+ * @args: Liste d'arguments
+ * Return: Nombre de caractères imprimés
+ */
+int handle_format(char format, va_list args)
+{
+	if (format == 'c')
+		return (print_char(args));
+
+	if (format == 's')
+		return (print_string(args));
+
+	if (format == '%')
+		return (write(1, "%", 1));
+
+	/* Supprime le else inutile */
+	write(1, "%", 1);
+	write(1, &format, 1);
+	return (2);
 }
 
 /**
@@ -41,44 +68,36 @@ int print_string(va_list args)
  */
 int _printf(const char *format, ...)
 {
-    va_list args;
-    int count = 0, temp;
-    
-    if (!format)
-        return (-1);
+	va_list args;
+	int count = 0, temp;
 
-    va_start(args, format);
+	if (!format)
+		return (-1);
 
-    while (*format)
-    {
-        if (*format == '%')
-        {
-            format++;
-            if (*format == 'c')
-                temp = print_char(args);
-            else if (*format == 's')
-                temp = print_string(args);
-            else if (*format == '%')
-                temp = write(1, "%", 1);
-            else
-            {
-                temp = write(1, "%", 1) + write(1, format, 1);
-            }
+	va_start(args, format);
 
-            if (temp == -1)
-                return (-1);
-            count += temp;
-        }
-        else
-        {
-            if (write(1, format, 1) == -1)
-                return (-1);
-            count++;
-        }
-        format++;
-    }
+	while (*format)
+	{
+		if (*format == '%')
+		{
+			format++;
+			temp = handle_format(*format, args);
+		}
+		else
+		{
+			temp = write(1, format, 1);
+		}
 
-    va_end(args);
-    return (count);
+		if (temp == -1)
+		{
+			va_end(args);
+			return (-1);
+		}
+		count += temp;
+		format++;
+	}
+
+	va_end(args);
+	return (count);
 }
 
