@@ -2,65 +2,83 @@
 #include <unistd.h>
 
 /**
- * _printf - Implémentation simplifiée de printf.
- * @format: La chaîne de format contenant les spécificateurs.
- *
- * Return: Le nombre de caractères imprimés.
+ * print_char - Affiche un caractère
+ * @args: Liste d'arguments
+ * Return: 1 (nombre de caractères imprimés)
+ */
+int print_char(va_list args)
+{
+    char c = va_arg(args, int);
+    return (write(1, &c, 1) == -1 ? -1 : 1);
+}
+
+/**
+ * print_string - Affiche une chaîne de caractères
+ * @args: Liste d'arguments
+ * Return: Nombre de caractères imprimés
+ */
+int print_string(va_list args)
+{
+    char *str = va_arg(args, char *);
+    int count = 0, i;
+
+    if (!str)
+        str = "(null)";
+    
+    for (i = 0; str[i] != '\0'; i++)
+    {
+        if (write(1, &str[i], 1) == -1)
+            return (-1);
+        count++;
+    }
+    return (count);
+}
+
+/**
+ * _printf - Implémentation simplifiée de printf
+ * @format: Chaîne de format
+ * Return: Nombre de caractères imprimés
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
+    va_list args;
+    int count = 0, temp;
+    
+    if (!format)
+        return (-1);
 
-	int count = 0; /* Compteur des caractères imprimés */
-	int i, j; /* Déclarer les variables i et j avant les boucles */
+    va_start(args, format);
 
-	/* Initialiser la liste d'arguments */
-	va_start(args, format);
+    while (*format)
+    {
+        if (*format == '%')
+        {
+            format++;
+            if (*format == 'c')
+                temp = print_char(args);
+            else if (*format == 's')
+                temp = print_string(args);
+            else if (*format == '%')
+                temp = write(1, "%", 1);
+            else
+            {
+                temp = write(1, "%", 1) + write(1, format, 1);
+            }
 
-	/* Parcourir la chaîne de format */
-	for (i = 0; format[i] != '\0'; i++) {
-		if (format[i] == '%') {
-			/* Si on trouve un '%', on regarde ce qui suit */
-			i++; /* Passer au caractère suivant */
+            if (temp == -1)
+                return (-1);
+            count += temp;
+        }
+        else
+        {
+            if (write(1, format, 1) == -1)
+                return (-1);
+            count++;
+        }
+        format++;
+    }
 
-			if (format[i] == 'c') {
-				/* Spécificateur pour un caractère */
-				char c = va_arg(args, int); /* Récupérer le caractère */
-				write(1, &c, 1); /* Imprimer le caractère */
-				count++; /* Augmenter le compteur */
-			}
-			else if (format[i] == 's') {
-				/* Spécificateur pour une chaîne de caractères */
-				char *str = va_arg(args, char*);
-
-				/* Si la chaîne est NULL, afficher "(null)" */
-				if (str == NULL) {
-					str = "(null)";
-				}
-
-				/* Imprimer la chaîne caractère par caractère */
-				for (j = 0; str[j] != '\0'; j++) {
-					write(1, &str[j], 1);
-					count++; /* Compter les caractères */
-				}
-			}
-			else if (format[i] == '%') {
-				/* Si on trouve '%%', afficher un '%' littéral */
-				write(1, "%", 1);
-				count++; /* Compter le caractère '%' */
-			}
-		}
-		else {
-			/* Si ce n'est pas un '%', on imprime le caractère tel quel */
-			write(1, &format[i], 1);
-			count++; /* Compter les caractères */
-		}
-	}
-
-	/* Nettoyer la liste d'arguments */
-	va_end(args);
-
-	/* Retourner le nombre de caractères imprimés */
-	return (count);
+    va_end(args);
+    return (count);
 }
 
