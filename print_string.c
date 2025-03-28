@@ -18,4 +18,3 @@ while (*str != '\0')
 
     return count;
 }
-
